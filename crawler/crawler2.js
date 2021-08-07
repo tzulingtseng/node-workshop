@@ -20,17 +20,16 @@ new Promise((resolve, reject) => {
 })
   .then((stockNo) => {
     //進入這裡，表示上一個promise已經成功resolve
-    axios
-      .get("https://www.twse.com.tw/exchangeReport/STOCK_DAY", {
-        params: {
-          response: "json",
-          date: moment().format("YYYYMMDD"), //動態日期
-          stockNo: stockNo,
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-      });
+    return axios.get("https://www.twse.com.tw/exchangeReport/STOCK_DAY", {
+      params: {
+        response: "json",
+        date: moment().format("YYYYMMDD"), //動態日期
+        stockNo: stockNo,
+      },
+    });
+  })
+  .then((response) => {
+    console.log(response.data);
   })
   .catch((error) => {
     console.error(error);
