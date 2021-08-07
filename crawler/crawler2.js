@@ -14,7 +14,8 @@ new Promise((resolve, reject) => {
       //   console.error("錯誤",err);
       reject(err);
     } else {
-      resolve(stockCode);
+      // 若讀的檔案，字超過一行，用".trim()"把空行過濾
+      resolve(stockCode.trim());
     }
   });
 })
@@ -29,7 +30,7 @@ new Promise((resolve, reject) => {
     });
   })
   .then((response) => {
-    console.log(response.data);
+    console.log(response.data.title);
   })
   .catch((error) => {
     console.error(error);
