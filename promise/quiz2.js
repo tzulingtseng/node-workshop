@@ -13,6 +13,6 @@ console.log(4);
 asyncF();
 console.log(5);
 
-// Answer:
+// Reply:
 // 41523
-// 一開始先執行第1行，再去第12行，丟4到call stack，return call stack的4出來，再去第13行遇到回呼asyncF()，進入第2行，印出1，接下來為什麼不會等async/await完呢？？？而是先印出5，再跑進去await等setTimeout完印出2，再到3
+// 一開始先執行第12行，再去第13行遇到asyncF()呼叫，進入第2行，印出1，先await，執行第14行印出5，再跑進去await setTimeout完印出2，再到3
