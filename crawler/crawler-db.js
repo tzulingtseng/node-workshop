@@ -4,6 +4,7 @@ const moment = require("moment"); //引用moment第三方套件
 //非同步（交給暗樁）：讀檔案、網路傳輸、讀寫資料庫
 const fs = require("fs");
 const mysql = require("mysql");
+require("dotenv").config();
 
 async function doWork() {
   try {
@@ -18,11 +19,12 @@ async function doWork() {
     });
 
     // 放在需要連資料庫的地方
-    var connection = mysql.createConnection({
-      host: "localhost",
-      user: "admin",
-      password: "1111",
-      database: "stock",
+    const connection = mysql.createConnection({
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
     });
 
     connection.connect((err) => {
