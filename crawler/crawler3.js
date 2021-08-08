@@ -5,27 +5,31 @@ const moment = require("moment"); //引用moment第三方套件
 const fs = require("fs");
 
 async function doWork() {
-  let stockNo = await new Promise((resolve, reject) => {
-    fs.readFile("stock.txt", "utf8", (err, stockCode) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(stockCode);
-      }
+  try {
+    let stockNo = await new Promise((resolve, reject) => {
+      fs.readFile("stock.txt", "utf8", (err, stockCode) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(stockCode);
+        }
+      });
     });
-  });
 
-  let response = await axios.get(
-    "https://www.twse.com.tw/exchangeReport/STOCK_DAY",
-    {
-      params: {
-        response: "json",
-        date: moment().format("YYYYMMDD"), //動態日期
-        stockNo: stockNo,
-      },
-    }
-  );
-  console.log(response.data.title);
+    let response = await axios.get(
+      "https://www.twse.com.tw/exchangeReport/STOCK_DAY",
+      {
+        params: {
+          response: "json",
+          date: moment().format("YYYYMMDD"), //動態日期
+          stockNo: stockNo,
+        },
+      }
+    );
+    console.log(response.data.title);
+  } catch (e) {
+    console.error(e);
+  }
 }
 doWork();
 
@@ -39,3 +43,9 @@ doWork();
 //   .catch((error) => {
 //     console.error(error);
 //   });
+
+// try {
+//   doWork();
+// } catch (e) {
+//   console.error(e);
+// }
