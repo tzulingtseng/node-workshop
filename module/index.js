@@ -1,3 +1,7 @@
-let shoes = require("./shoes");
+const shoes = require("./shoes");
 console.log(shoes);
-console.log(shoes.showBrand());
+console.log(shoes.getBrand());
+console.log(shoes.getSlogan());
+
+shoes.setOwner("Jordan");
+console.log(shoes.getOwner());
