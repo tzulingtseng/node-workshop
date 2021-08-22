@@ -5,7 +5,7 @@ let color = "red";
 let slogan = "Just Do It!";
 let owner = "";
 
-// JS看到使用者創模組就會偷偷幫你預設空物件
+// JS看到使用者創模組module就會偷偷幫你預設空物件
 // exports = module.exports = {};
 
 function setOwner(name) {
@@ -28,13 +28,22 @@ function getSlogan() {
 function getColor() {
   return color;
 }
-//雖然輸出的為module.exports但用點的方式可以更改到原生物件
+
+// 雖然匯出的為module.exports，但用點的方式可以更改到原生物件
+// 以下兩個是一樣的：
+// module.exports和exports指向同一個空物件，
+// 在空物件內加一個屬性getBrand:function()函式前面定義好了
+
 // exports.getBrand = getBrand;
-// exports.getName = getName;
-// exports.getFlavor = getFlavor;
+// module.exports.getSlogan = getSlogan;
+
+// 匯出物件給index.js用法：
+// exports.getBrand = getBrand;
+// exports.setOwner = setOwner;
+// exports.getOwner = getOwner;
 
 //想整理成物件看起來比較舒服，但其實不行。
-//因為這樣會創出一個新物件，而module.exports還會是老樣子腦袋空空沒有東西
+//因為這樣會創出一個新物件，exports指向新物件，而module.exports還會是老樣子腦袋空空沒有東西
 // exports = {
 //   getBrand,
 //   getName,
