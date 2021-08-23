@@ -1,4 +1,5 @@
 const express = require("express");
+const connection = require("./utils/db");
 
 // 利用 express 建立了一個 express application
 let app = express();
@@ -16,16 +17,21 @@ app.use((req, res, next) => {
 });
 
 // HTTP Method: get, post, put, patch, delete
-app.get("/", function (request, response, next) {
+app.get("/", (request, response, next) => {
   response.send("Hello");
 });
-app.get("/about", function (request, response, next) {
+app.get("/about", (request, response, next) => {
   response.send("about1");
 });
-app.get("/about", function (request, response, next) {
+app.get("/about", (request, response, next) => {
   response.send("about2");
 });
+app.get("/stock", async (request, response, next) => {
+  let result = await connection.queryAsync("SELECT * FROM stock");
+  response.json(result);
+});
 
-app.listen(3000, function () {
+app.listen(3000, async function () {
+  await connection.connectAsync();
   console.log("我們的 web server 啟動了～");
 });
