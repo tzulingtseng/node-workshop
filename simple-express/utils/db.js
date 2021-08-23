@@ -4,12 +4,14 @@ const Promise = require("bluebird"); // Promise用大寫，要蓋掉不能用new
 
 // exports = module.exports = {};
 
-let connection = mysql.createConnection({
+let connection = mysql.createPool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+  // 設定預設值 ||前面沒有的話就執行後面10
+  connectionLimit: process.env.CONNECTION_LIMIT || 10,
 });
 // bluebird
 // 擴充
