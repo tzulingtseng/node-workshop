@@ -4,6 +4,10 @@ const connection = require("./utils/db");
 // 利用 express 建立了一個 express application
 let app = express();
 
+// cors用在所有路由和中間件前面
+const cors = require("cors");
+app.use(cors());
+
 // app.use和app.get瀏覽器要重新整理發一個請求才會觸發
 app.use((req, res, next) => {
   let current = new Date();
