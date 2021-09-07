@@ -20,7 +20,7 @@ const bcrypt = require("bcrypt");
 // registerRules也可以是一個中間件，如果只想給特定路由使用，可以放在以下位置
 // app.post("path","中間件1(真正的處理函式)")
 // app.post("path","中間件1","中間件2",.....) => 中間件可以有好幾個，只要最後記得有response
-router.post("/auth/register", registerRules, async (request, response, next) => {
+router.post("/register", registerRules, async (request, response, next) => {
   const validateResult = validationResult(request);
   // console.log(validateResult);
   // 不是空的表示驗證不通過
