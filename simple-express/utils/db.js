@@ -12,6 +12,7 @@ let connection = mysql.createPool({
   database: process.env.DB_NAME,
   // 設定預設值 ||前面沒有的話就執行後面10
   connectionLimit: process.env.CONNECTION_LIMIT || 10,
+  dateStrings:true,
 });
 // bluebird
 // 擴充
