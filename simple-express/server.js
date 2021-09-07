@@ -57,50 +57,15 @@ app.get("/about", (request, response, next) => {
   response.send("about2");
 });
 
-// 因 express-validator 很大，部分引用
-const { body, validationResult } = require("express-validator");
-// 引用後設定驗證規則
-const registerRules = [
-  body("email").isEmail().withMessage("Email 欄位請填寫正確格式"),
-  body("password").isLength({ min: 6 }).withMessage("密碼長度至少為6碼"),
-  body("confirmPassword")
-    .custom((value, { req }) => {
-      return value === req.body.password;
-    })
-    .withMessage("密碼驗證不一致"),
-];
+// 引入 stock router 這個中間件
+let stockRouter=require("./routers/stock");
+// /stock
+// /stock/:stockCode
+// 使用 stock router 這個中間件
+app.use("/stock",stockRouter)
 
-const bcrypt=require("bcrypt");
-
-// TODO 1: 建立好路由
-// registerRules也可以是一個中間件，如果只想給特定路由使用，可以放在以下位置
-// app.post("path","中間件1(真正的處理函式)")
-// app.post("path","中間件1","中間件2",.....) => 中間件可以有好幾個，只要最後記得有response
-app.post("/auth/register", registerRules, async (request, response, next) => {
-  const validateResult = validationResult(request);
-  // console.log(validateResult);
-  // 不是空的表示驗證不通過
-  if (!validateResult.isEmpty()) {
-    // 把錯誤拿出來
-    let error = validateResult.array();
-    console.log(error);
-    // 回覆第一個錯誤
-    return response
-      .status(400)
-      .json({ field: error[0].param, message: error[0].msg });
-  }
-  // TODO 2: 確認前端給的資料有拿到
-  // 因前端發請求，req.body拿到前端發過來的資料
-  console.log(request.body);
-  // TODO 3: 存進資料庫
-  // TODO: 密碼不可以是明文 bcrypt.hash(明文,salt)
-  // TODO: 格式驗證 -> 後端絕對不可以相信來自前端的資料
-  let result = await connection.queryAsync(
-    "INSERT INTO members (email, password, name) VALUES (?);",
-    [[request.body.email, await bcrypt.hash(request.body.password,10), request.body.name]]
-  );
-  response.json({});
-});
+let authRouter=require("./routers/auth")
+app.use("/auth",authRouter)
 
 // app.get("/api/product", async (req, res, next) => {
 //   let page = req.query.page || 1; // 目前在第幾頁，預設第一頁
@@ -133,63 +98,7 @@ app.post("/auth/register", registerRules, async (request, response, next) => {
 //   res.json({ pagination, sqlSelect });
 // });
 
-// stock GET API
-app.get("/stock", async (request, response, next) => {
-  let result = await connection.queryAsync("SELECT * FROM stock");
-  response.json(result);
-});
-
-// stock_price GET API
-// /stock/2330 => stockCode = 2330
-// /stock/2330?page=1
-app.get("/stock/:stockCode", async (req, res, next) => {
-  // 取網址上面的參數，用params來取，冒號後面寫什麼，就會有該變數名稱
-  // req.params.stockCode
-  // 取page的話
-  // req.query.page
-
-  let page = req.query.page || 1; // 目前在第幾頁，預設第一頁
-  const perPage = 10; // 每一頁的資料是10筆
-  // TODO01：總共有幾筆 / 總共有幾頁
-  let count = await connection.queryAsync(
-    "SELECT COUNT(*) AS total FROM stock_price"
-  );
-  console.log(count); // [ RowDataPacket { total: 15 } ]
-  const total = count[0].total; // total 15
-  // console.log(total);
-  const lastPage = Math.ceil(total / perPage);
-  console.log(total, lastPage);
-
-  // TODO02：取得這一頁應該要有的資料
-  // LIMIT:這一頁要取幾筆資料
-  // offset:要跳過幾筆資料
-  // page 1:1-10 跳過0筆資料
-  // page 2:11-20 跳過10筆資料
-
-  let offset = (page - 1) * perPage;
-
-  // req.params.stockCode 冒號後面寫什麼，就會有該變數名稱
-  let result = await connection.queryAsync(
-    "SELECT * FROM stock_price WHERE stock_id=? ORDER BY date LIMIT ? OFFSET ?",
-    [req.params.stockCode, perPage, offset]
-  );
-  // 回覆 pagination 資料給前端
-  let pagination = {
-    total, // 總共有幾筆
-    perPage, // 一頁有幾筆
-    lastPage, // 總共有幾頁（最後一頁）
-    page, // 目前在第幾頁
-  };
-  // 撈出來result是陣列，裡面有10筆資料
-  // res.json(result)
-  // 注意格式的修改
-  // res.json({pagination:pagination,result:result});
-  // ES6寫法：名稱和變數(key=>value)相同可省略一個，
-  // 資料格式變成一個物件裡面分別有pagination, result兩個屬性
-  res.json({ pagination, result });
-});
-
-// 既然會調到這裡，表示前面都沒有任何符合的路由網址
+// 既然會掉到這裡，表示前面都沒有任何符合的路由網址
 // 導致沒有任何 response（旅程一直沒有結束）
 // 利用這個特性，把這裡當作404錯誤處理
 app.use((req, res, next) => {
