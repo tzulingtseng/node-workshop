@@ -1,5 +1,6 @@
 const express = require("express");
 const connection = require("./utils/db");
+const path = require("path");
 
 // 利用 express 建立了一個 express application
 let app = express();
@@ -13,6 +14,11 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 // 使用這個中間件才可以解析json的資料
 app.use(express.json());
+
+// 用中間件設定靜態檔案的位置
+// 靜態檔案：圖片、前端的 js, css, html,...
+// http://localhost:3001
+app.use(express.static(path.join(__dirname, "public")));
 
 // app.use 使用一個 "中間件"
 // app.use(middleware)
@@ -58,14 +64,15 @@ app.get("/about", (request, response, next) => {
 });
 
 // 引入 stock router 這個中間件
-let stockRouter=require("./routers/stock");
+let stockRouter = require("./routers/stock");
 // /stock
 // /stock/:stockCode
 // 使用 stock router 這個中間件
-app.use("/stock",stockRouter)
+app.use("/stock", stockRouter);
 
-let authRouter=require("./routers/auth")
-app.use("/auth",authRouter)
+let authRouter = require("./routers/auth");
+const { MulterError } = require("multer");
+app.use("/auth", authRouter);
 
 // app.get("/api/product", async (req, res, next) => {
 //   let page = req.query.page || 1; // 目前在第幾頁，預設第一頁
@@ -112,8 +119,12 @@ app.use((req, res, next) => {
 // (1)沒有處理的 exception
 // (2)流程上設計想要跳到這裡=> next(xxx) 透過在 next 傳遞參數
 app.use((err, req, res, next) => {
-  console.error(err);
+  console.error("來自四個參數的錯誤處理", err);
+  if (err instanceof MulterError) {
+    return res.status(400).json({ message: "檔案太大了" });
+  }
   res.status(err.status).json({ message: err.message });
+  // 如果不符合上述特殊的錯誤類別，那表示就是我們自訂的
 });
 app.listen(3001, async function () {
   // 改用pool，需要用的時候自動建立連線，不需要以下手動連線
